@@ -1,0 +1,33 @@
+name: Epicgames Freebies Claimer
+on: 
+  push:
+  workflow_dispatch:
+  repository_dispatch:
+  schedule:
+    - cron:  '42 16 * * 4'
+  watch:
+    types: [started]
+
+jobs:
+  Claim:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          repository: "Revadike/epicgames-freebies-claimer"
+          persist-credentials: false
+      - name: Use Node.js 14.x 
+        uses: actions/setup-node@v1 
+        with:
+          node-version: "14.x"
+                  
+      - name: Run
+        env:
+          AUTH_JSON: ${{ secrets.AUTH_JSON }}
+        run: |
+          echo "$AUTH_JSON" | tr -d '\r' > $GITHUB_WORKSPACE/device_auths.json
+          sed -i 's/true/false/g' config.json
+          npm i 
+          npm start
